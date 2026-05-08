@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Battle - Mizo Social</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#f47155">
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
+        body { background: #000; color: #fff; }
+       .hidden { display: none!important; }
+        #loginPage { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #f47155, #e91e63); padding: 20px; }
+       .login-box { background: rgba(0,0,0,0.8); padding: 40px 30px; border-radius: 20px; width: 100%; max-width: 350px; text-align: center; }
+       .logo { font-size: 60px; margin-bottom: 10px; }
+        h1 { font-size: 28px; margin-bottom: 30px; }
+       .btn { width: 100%; padding: 15px; margin: 8px 0; border: none; border-radius: 50px; font-size: 16px; font-weight: bold; cursor: pointer; }
+       .btn-google { background: #fff; color: #000; }
+       .btn-phone { background: transparent; border: 2px solid #fff; color: #fff; }
+        input { width: 100%; padding: 15px; margin: 8px 0; border-radius: 50px; border: none; background: rgba(255,255,255,0.2); color: #fff; font-size: 16px; }
+        #app { display: flex; flex-direction: column; height: 100vh; }
+       .battle-container { flex: 1; display: flex; position: relative; }
+       .player { flex: 1; position: relative; background: #222; }
+       .player video { width: 100%; height: 100%; object-fit: cover; }
+       .beauty { filter: contrast(1.1) brightness(1.1) saturate(1.2); }
+       .uglu { filter: contrast(2) hue-rotate(180deg) saturate(0); }
+       .player-info { position: absolute; bottom: 80px; left: 10px; background: rgba(0,0,0,0.6); padding: 8px 12px; border-radius: 20px; }
+       .vote-btn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: #f47155; padding: 12px 30px; border-radius: 50px; border: none; color: #fff; font-weight: bold; }
+       .chat-box { position: absolute; right: 10px; bottom: 100px; width: 200px; height: 300px; background: rgba(0,0,0,0.5); border-radius: 15px; padding: 10px; overflow-y: auto; }
+       .chat-msg { font-size: 12px; margin: 5px 0; }
+       .chat-input { position: absolute; bottom: 10px; right: 10px; width: 200px; }
+       .winner-banner { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: gold; color: #000; padding: 20px 40px; border-radius: 15px; font-size: 24px; font-weight: bold; z-index: 100; }
+       .bottom-nav { display: flex; background: #111; padding: 15px 0; border-top: 1px solid #333; }
+       .nav-item { flex: 1; text-align: center; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <!-- LOGIN PAGE -->
+    <div id="loginPage">
+        <div class="login-box">
+            <div class="logo">⚔️</div>
+            <h1>Live Battle</h1>
+            <p style="margin-bottom:20px; opacity:0.8;">Mizo Live Battle Platform</p>
+            <input type="tel" id="phoneNumber" placeholder="Phone Number +91..." class="hidden">
+            <button class="btn btn-phone" onclick="showPhoneLogin()">Phone Number Login</button>
+            <button class="btn btn-google" onclick="googleLogin()">Continue with Google</button>
+            <button class="btn btn-phone hidden" id="sendOtpBtn" onclick="sendOTP()">Send OTP</button>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="app" class="hidden">
+        <div class="battle-container">
+            <!-- PLAYER 1 -->
+            <div class="player">
+                <video id="player1" autoplay muted playsinline class="beauty"></video>
+                <div class="player-info">@mizo_star1<br>1200 Followers</div>
+                <button class="vote-btn" onclick="vote(1)">VOTE ❤️ <span id="vote1">0</span></button>
+            </div>
+            <!-- PLAYER 2 -->
+            <div class="player">
+                <video id="player2" autoplay muted playsinline></video>
+                <div class="player-info">@mizo_star2<br>980 Followers</div>
+                <button class="vote-btn" onclick="vote(2)">VOTE ❤️ <span id="vote2">0</span></button>
+            </div>
+
+            <!-- LIVE CHAT -->
+            <div class="chat-box" id="chatBox">
+                <div class="chat-msg"><b>@user1:</b> A va pui ve</div>
+                <div class="chat-msg"><b>@user2:</b> Player 1 ka vote</div>
+            </div>
+            <input class="chat-input" id="chatInput" placeholder="Chat..." onkeypress="sendChat(event)">
+
+            <!-- WINNER BANNER -->
+            <div id="winnerBanner" class="winner-banner hidden">🏆 WINNER: @mizo_star1</div>
+        </div>
+
+        <!-- BOTTOM NAV -->
+        <div class="bottom-nav">
+            <div class="nav-item">🏠<br>Home</div>
+            <div class="nav-item">🔴<br>Live</div>
+            <div class="nav-item">➕<br>Battle</div>
+            <div class="nav-item">💬<br>Chat</div>
+            <div class="nav-item">👤<br>Profile</div>
+        </div>
+    </div>
+
+    <script>
+        // FIREBASE CONFIG - I TAN A THLAK A NGAI
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID"
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        let votes = {1: 0, 2: 0};
+
+        function showPhoneLogin() {
+            document.getElementById('phoneNumber').classList.remove('hidden');
+            document.getElementById('sendOtpBtn').classList.remove('hidden');
+        }
+
+        function sendOTP() {
+            alert('OTP thawn a ni - Firebase setup a ngai');
+        }
+
+        function googleLogin() {
+            // Demo tan: Login bypass
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('app').classList.remove('hidden');
+            startCamera();
+        }
+
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({video:true, audio:true});
+                document.getElementById('player1').srcObject = stream;
+            } catch(e) { alert('Camera phalna pe rawh'); }
+        }
+
+        function vote(player) {
+            votes[player]++;
+            document.getElementById('vote'+player).textContent = votes[player];
+            checkWinner();
+        }
+
+        function checkWinner() {
+            if (votes[1] >= 10 || votes[2] >= 10) {
+                let winner = votes[1] > votes[2]? 1 : 2;
+                let loser = winner === 1? 2 : 1;
+                document.getElementById('winnerBanner').textContent = '🏆 WINNER: Player ' + winner;
+                document.getElementById('winnerBanner').classList.remove('hidden');
+                document.getElementById('player'+loser).classList.add('uglu');
+                setTimeout(() => {
+                    document.getElementById('winnerBanner').classList.add('hidden');
+                    document.getElementById('player'+loser).classList.remove('uglu');
+                    votes = {1:0, 2:0};
+                    document.getElementById('vote1').textContent = 0;
+                    document.getElementById('vote2').textContent = 0;
+                }, 5000);
+            }
+        }
+
+        function sendChat(e) {
+            if (e.key === 'Enter') {
+                const msg = document.getElementById('chatInput').value;
+                if (msg) {
+                    const chatBox = document.getElementById('chatBox');
+                    chatBox.innerHTML += `<div class="chat-msg"><b>@you:</b> ${msg}</div>`;
+                    document.getElementById('chatInput').value = '';
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }
+            }
+        }
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
+</body>
+</html>
