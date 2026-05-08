@@ -1,0 +1,20 @@
+{
+  "name": "Live Battle - Mizo Social",
+  "short_name": "Battle",
+  "start_url": "/live-battle-social/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#f47155",
+  "icons": [
+    {
+      "src": "https://placehold.co/192x192/f47155/ffffff.png?text=⚔️",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://placehold.co/512x512/f47155/ffffff.png?text=⚔️",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
