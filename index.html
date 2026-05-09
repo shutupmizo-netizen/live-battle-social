@@ -6,35 +6,53 @@
     <title>Live Battle - Mizo Social</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#f47155">
+    <link rel="icon" href="icone-512.png">
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
-        body { background: #000; color: #fff; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+        body { background: #000; color: #fff; overflow: hidden; }
        .hidden { display: none!important; }
+
+        /* LOGIN PAGE */
         #loginPage { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #f47155, #e91e63); padding: 20px; }
-       .login-box { background: rgba(0,0,0,0.8); padding: 40px 30px; border-radius: 20px; width: 100%; max-width: 350px; text-align: center; }
+       .login-box { background: rgba(0,0,0,0.85); padding: 40px 30px; border-radius: 20px; width: 100%; max-width: 350px; text-align: center; backdrop-filter: blur(10px); }
        .logo { font-size: 60px; margin-bottom: 10px; }
-        h1 { font-size: 28px; margin-bottom: 30px; }
-       .btn { width: 100%; padding: 15px; margin: 8px 0; border: none; border-radius: 50px; font-size: 16px; font-weight: bold; cursor: pointer; }
-       .btn-google { background: #fff; color: #000; }
+        h1 { font-size: 28px; margin-bottom: 10px; }
+       .subtitle { margin-bottom: 30px; opacity: 0.8; font-size: 14px; }
+       .btn { width: 100%; padding: 15px; margin: 8px 0; border: none; border-radius: 50px; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+       .btn:active { transform: scale(0.98); }
+       .btn-google { background: #fff; color: #000; display: flex; align-items: center; justify-content: center; gap: 10px; }
        .btn-phone { background: transparent; border: 2px solid #fff; color: #fff; }
-        input { width: 100%; padding: 15px; margin: 8px 0; border-radius: 50px; border: none; background: rgba(255,255,255,0.2); color: #fff; font-size: 16px; }
+       .btn-primary { background: #f47155; color: #fff; }
+        input { width: 100%; padding: 15px; margin: 8px 0; border-radius: 50px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: #fff; font-size: 16px; outline: none; }
+        input::placeholder { color: rgba(255,255,255,0.6); }
+        input:focus { border-color: #f47155; }
+       .error-msg { color: #ff6b6b; font-size: 12px; margin-top: 5px; min-height: 18px; }
+        #recaptcha-container { margin: 10px 0; }
+
+        /* MAIN APP */
         #app { display: flex; flex-direction: column; height: 100vh; }
+       .header { padding: 15px; background: #111; text-align: center; font-weight: bold; border-bottom: 1px solid #333; }
        .battle-container { flex: 1; display: flex; position: relative; }
        .player { flex: 1; position: relative; background: #222; }
-       .player video { width: 100%; height: 100%; object-fit: cover; }
+       .player video { width: 100%; height: 100%; object-fit: cover; background: linear-gradient(45deg, #333, #111); }
        .beauty { filter: contrast(1.1) brightness(1.1) saturate(1.2); }
-       .uglu { filter: contrast(2) hue-rotate(180deg) saturate(0); }
-       .player-info { position: absolute; bottom: 80px; left: 10px; background: rgba(0,0,0,0.6); padding: 8px 12px; border-radius: 20px; }
-       .vote-btn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: #f47155; padding: 12px 30px; border-radius: 50px; border: none; color: #fff; font-weight: bold; }
-       .chat-box { position: absolute; right: 10px; bottom: 100px; width: 200px; height: 300px; background: rgba(0,0,0,0.5); border-radius: 15px; padding: 10px; overflow-y: auto; }
-       .chat-msg { font-size: 12px; margin: 5px 0; }
-       .chat-input { position: absolute; bottom: 10px; right: 10px; width: 200px; }
-       .winner-banner { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: gold; color: #000; padding: 20px 40px; border-radius: 15px; font-size: 24px; font-weight: bold; z-index: 100; }
-       .bottom-nav { display: flex; background: #111; padding: 15px 0; border-top: 1px solid #333; }
-       .nav-item { flex: 1; text-align: center; font-size: 12px; }
+       .uglu { filter: contrast(2) hue-rotate(180deg) saturate(0); transition: 0.5s; }
+       .player-info { position: absolute; bottom: 80px; left: 10px; background: rgba(0,0,0,0.7); padding: 8px 12px; border-radius: 20px; font-size: 13px; }
+       .vote-btn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: #f47155; padding: 12px 30px; border-radius: 50px; border: none; color: #fff; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(244,113,85,0.4); }
+       .vote-btn:active { transform: translateX(-50%) scale(0.95); }
+       .chat-box { position: absolute; right: 10px; bottom: 100px; width: 220px; height: 300px; background: rgba(0,0,0,0.6); border-radius: 15px; padding: 10px; overflow-y: auto; backdrop-filter: blur(5px); }
+       .chat-msg { font-size: 12px; margin: 8px 0; word-wrap: break-word; }
+       .chat-msg b { color: #f47155; }
+       .chat-input { position: absolute; bottom: 10px; right: 10px; width: 220px; padding: 10px 15px; border-radius: 50px; border: none; background: rgba(255,255,255,0.2); color: #fff; }
+       .winner-banner { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; padding: 20px 40px; border-radius: 15px; font-size: 24px; font-weight: bold; z-index: 100; animation: pop 0.3s; box-shadow: 0 10px 30px rgba(255,215,0,0.5); }
+        @keyframes pop { 0% { transform: translate(-50%, -50%) scale(0); } 100% { transform: translate(-50%, -50%) scale(1); } }
+       .bottom-nav { display: flex; background: #111; padding: 12px 0; border-top: 1px solid #333; }
+       .nav-item { flex: 1; text-align: center; font-size: 11px; cursor: pointer; opacity: 0.7; }
+       .nav-item.active { opacity: 1; color: #f47155; }
+       .loading { text-align: center; padding: 20px; opacity: 0.6; }
     </style>
 </head>
 <body>
@@ -43,125 +61,257 @@
         <div class="login-box">
             <div class="logo">⚔️</div>
             <h1>Live Battle</h1>
-            <p style="margin-bottom:20px; opacity:0.8;">Mizo Live Battle Platform</p>
-            <input type="tel" id="phoneNumber" placeholder="Phone Number +91..." class="hidden">
-            <button class="btn btn-phone" onclick="showPhoneLogin()">Phone Number Login</button>
-            <button class="btn btn-google" onclick="googleLogin()">Continue with Google</button>
-            <button class="btn btn-phone hidden" id="sendOtpBtn" onclick="sendOTP()">Send OTP</button>
+            <p class="subtitle">Mizo Live Battle Platform</p>
+
+            <div id="phoneLoginDiv" class="hidden">
+                <input type="tel" id="phoneNumber" placeholder="+91 9876543210">
+                <div id="recaptcha-container"></div>
+                <button class="btn btn-primary" id="sendOtpBtn" onclick="sendOTP()">Send OTP</button>
+                <input type="text" id="otpCode" placeholder="Enter OTP" class="hidden">
+                <button class="btn btn-primary hidden" id="verifyOtpBtn" onclick="verifyOTP()">Verify OTP</button>
+            </div>
+
+            <div id="mainLoginBtns">
+                <button class="btn btn-phone" onclick="showPhoneLogin()">📱 Phone Number Login</button>
+                <button class="btn btn-google" onclick="googleLogin()">
+                    <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/><path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 0 1-7.18-2.54H1.83v2.07A8 8 0 0 0 8.98 17z"/><path fill="#FBBC05" d="M4.5 10.52a4.8 0 0 1 0-3.04V5.41H1.83a8 8 0 0 7.18l2.67-2.07z"/><path fill="#EA4335" d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 1.83 5.4L4.5 7.49a4.77 4.77 0 0 1 4.48-3.3z"/></svg>
+                    Continue with Google
+                </button>
+            </div>
+            <div class="error-msg" id="loginError"></div>
         </div>
     </div>
 
     <!-- MAIN APP -->
     <div id="app" class="hidden">
+        <div class="header">🔴 LIVE BATTLE - Round 1</div>
         <div class="battle-container">
             <!-- PLAYER 1 -->
             <div class="player">
                 <video id="player1" autoplay muted playsinline class="beauty"></video>
-                <div class="player-info">@mizo_star1<br>1200 Followers</div>
+                <div class="player-info">@mizo_star1<br><span id="followers1">1.2K</span> Followers</div>
                 <button class="vote-btn" onclick="vote(1)">VOTE ❤️ <span id="vote1">0</span></button>
             </div>
             <!-- PLAYER 2 -->
             <div class="player">
                 <video id="player2" autoplay muted playsinline></video>
-                <div class="player-info">@mizo_star2<br>980 Followers</div>
+                <div class="player-info">@mizo_star2<br><span id="followers2">980</span> Followers</div>
                 <button class="vote-btn" onclick="vote(2)">VOTE ❤️ <span id="vote2">0</span></button>
             </div>
 
             <!-- LIVE CHAT -->
             <div class="chat-box" id="chatBox">
-                <div class="chat-msg"><b>@user1:</b> A va pui ve</div>
-                <div class="chat-msg"><b>@user2:</b> Player 1 ka vote</div>
+                <div class="loading">Connecting chat...</div>
             </div>
             <input class="chat-input" id="chatInput" placeholder="Chat..." onkeypress="sendChat(event)">
 
             <!-- WINNER BANNER -->
-            <div id="winnerBanner" class="winner-banner hidden">🏆 WINNER: @mizo_star1</div>
+            <div id="winnerBanner" class="winner-banner hidden">🏆 WINNER!</div>
         </div>
 
         <!-- BOTTOM NAV -->
         <div class="bottom-nav">
-            <div class="nav-item">🏠<br>Home</div>
+            <div class="nav-item active">🏠<br>Home</div>
             <div class="nav-item">🔴<br>Live</div>
-            <div class="nav-item">➕<br>Battle</div>
+            <div class="nav-item" onclick="startBattle()">➕<br>Battle</div>
             <div class="nav-item">💬<br>Chat</div>
-            <div class="nav-item">👤<br>Profile</div>
+            <div class="nav-item" onclick="logout()">👤<br>Logout</div>
         </div>
     </div>
 
     <script>
-        // FIREBASE CONFIG - I TAN A THLAK A NGAI
-       // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyCcL9jbW7shc9CTJpUvAuuXyjpxwhdanlo",
-  authDomain: "live-battle-social.firebaseapp.com",
-  projectId: "live-battle-social",
-  storageBucket: "live-battle-social.firebasestorage.app",
-  messagingSenderId: "792106703995",
-  appId: "1:792106703995:web:191735b9e33b47f2dd96de",
-  measurementId: "G-Q7PT9S0Y9F"
-};
+        // FIREBASE CONFIG - I API KEY HI PUBLIC A NI A, FIREBASE RULES I SIAM THAT A NGAI
+        const firebaseConfig = {
+            apiKey: "AIzaSyCcL9jbW7shc9CTJpUvAuuXyjpxwhdanlo",
+            authDomain: "live-battle-social.firebaseapp.com",
+            projectId: "live-battle-social",
+            storageBucket: "live-battle-social.firebasestorage.app",
+            messagingSenderId: "792106703995",
+            appId: "1:792106703995:web:191735b9e33b47f2dd96de"
+        };
         firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
 
-        let votes = {1: 0, 2: 0};
+        let currentUser = null;
+        let confirmationResult = null;
+        let battleUnsubscribe = null;
+        let chatUnsubscribe = null;
+        const BATTLE_ID = 'current'; // Demo tan battle 1 chiah
 
+        // AUTH STATE
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('loginPage').classList.add('hidden');
+                document.getElementById('app').classList.remove('hidden');
+                initBattle();
+            } else {
+                document.getElementById('loginPage').classList.remove('hidden');
+                document.getElementById('app').classList.add('hidden');
+            }
+        });
+
+        // PHONE LOGIN
         function showPhoneLogin() {
-            document.getElementById('phoneNumber').classList.remove('hidden');
-            document.getElementById('sendOtpBtn').classList.remove('hidden');
+            document.getElementById('mainLoginBtns').classList.add('hidden');
+            document.getElementById('phoneLoginDiv').classList.remove('hidden');
+            window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+                'size': 'normal'
+            });
+            recaptchaVerifier.render();
         }
 
-        function sendOTP() {
-            alert('OTP thawn a ni - Firebase setup a ngai');
+        async function sendOTP() {
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const errorDiv = document.getElementById('loginError');
+            errorDiv.textContent = '';
+
+            if (!phoneNumber.startsWith('+')) {
+                errorDiv.textContent = 'Country code nen +91... tiin dah rawh';
+                return;
+            }
+
+            try {
+                document.getElementById('sendOtpBtn').textContent = 'Sending...';
+                confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier);
+                document.getElementById('phoneNumber').classList.add('hidden');
+                document.getElementById('sendOtpBtn').classList.add('hidden');
+                document.getElementById('otpCode').classList.remove('hidden');
+                document.getElementById('verifyOtpBtn').classList.remove('hidden');
+                document.getElementById('recaptcha-container').classList.add('hidden');
+            } catch (error) {
+                errorDiv.textContent = error.message;
+                document.getElementById('sendOtpBtn').textContent = 'Send OTP';
+            }
         }
 
-        function googleLogin() {
-            // Demo tan: Login bypass
-            document.getElementById('loginPage').classList.add('hidden');
-            document.getElementById('app').classList.remove('hidden');
-            startCamera();
+        async function verifyOTP() {
+            const code = document.getElementById('otpCode').value;
+            const errorDiv = document.getElementById('loginError');
+            try {
+                await confirmationResult.confirm(code);
+            } catch (error) {
+                errorDiv.textContent = 'OTP dik lo: ' + error.message;
+            }
+        }
+
+        // GOOGLE LOGIN
+        async function googleLogin() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            try {
+                await auth.signInWithPopup(provider);
+            } catch (error) {
+                document.getElementById('loginError').textContent = error.message;
+            }
+        }
+
+        // INIT BATTLE
+        async function initBattle() {
+            await startCamera();
+            setupRealtimeListeners();
         }
 
         async function startCamera() {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({video:true, audio:true});
+                const stream = await navigator.mediaDevices.getUserMedia({video:true, audio:false});
                 document.getElementById('player1').srcObject = stream;
-            } catch(e) { alert('Camera phalna pe rawh'); }
+            } catch(e) {
+                console.log('Camera phalna i pe lo:', e);
+            }
         }
 
-        function vote(player) {
-            votes[player]++;
-            document.getElementById('vote'+player).textContent = votes[player];
-            checkWinner();
+        // REALTIME VOTE + CHAT
+        function setupRealtimeListeners() {
+            const battleRef = db.collection('battles').doc(BATTLE_ID);
+
+            // Create battle doc if not exist
+            battleRef.get().then(doc => {
+                if (!doc.exists) {
+                    battleRef.set({
+                        votes: {1: 0, 2: 0},
+                        players: {1: '@mizo_star1', 2: '@mizo_star2'},
+                        winner: null,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+            });
+
+            // Listen votes
+            battleUnsubscribe = battleRef.onSnapshot(doc => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    document.getElementById('vote1').textContent = data.votes[1] || 0;
+                    document.getElementById('vote2').textContent = data.votes[2] || 0;
+                    checkWinner(data.votes[1], data.votes[2]);
+                }
+            });
+
+            // Listen chat
+            chatUnsubscribe = battleRef.collection('chat').orderBy('time', 'desc').limit(20).onSnapshot(snapshot => {
+                const chatBox = document.getElementById('chatBox');
+                chatBox.innerHTML = '';
+                snapshot.docs.reverse().forEach(doc => {
+                    const msg = doc.data();
+                    chatBox.innerHTML += `<div class="chat-msg"><b>@${msg.user}:</b> ${msg.text}</div>`;
+                });
+                chatBox.scrollTop = chatBox.scrollHeight;
+            });
         }
 
-        function checkWinner() {
-            if (votes[1] >= 10 || votes[2] >= 10) {
-                let winner = votes[1] > votes[2]? 1 : 2;
+        async function vote(player) {
+            const battleRef = db.collection('battles').doc(BATTLE_ID);
+            await battleRef.update({
+                [`votes.${player}`]: firebase.firestore.FieldValue.increment(1)
+            });
+        }
+
+        function checkWinner(v1, v2) {
+            const WIN_SCORE = 10;
+            if (v1 >= WIN_SCORE || v2 >= WIN_SCORE) {
+                let winner = v1 > v2? 1 : 2;
                 let loser = winner === 1? 2 : 1;
-                document.getElementById('winnerBanner').textContent = '🏆 WINNER: Player ' + winner;
+                document.getElementById('winnerBanner').textContent = `🏆 WINNER: Player ${winner}`;
                 document.getElementById('winnerBanner').classList.remove('hidden');
                 document.getElementById('player'+loser).classList.add('uglu');
-                setTimeout(() => {
+
+                setTimeout(async () => {
                     document.getElementById('winnerBanner').classList.add('hidden');
                     document.getElementById('player'+loser).classList.remove('uglu');
-                    votes = {1:0, 2:0};
-                    document.getElementById('vote1').textContent = 0;
-                    document.getElementById('vote2').textContent = 0;
+                    // Reset votes
+                    await db.collection('battles').doc(BATTLE_ID).update({
+                        'votes.1': 0, 'votes.2': 0
+                    });
                 }, 5000);
             }
         }
 
-        function sendChat(e) {
-            if (e.key === 'Enter') {
-                const msg = document.getElementById('chatInput').value;
+        async function sendChat(e) {
+            if (e.key === 'Enter' && currentUser) {
+                const msg = document.getElementById('chatInput').value.trim();
                 if (msg) {
-                    const chatBox = document.getElementById('chatBox');
-                    chatBox.innerHTML += `<div class="chat-msg"><b>@you:</b> ${msg}</div>`;
+                    const username = currentUser.displayName || currentUser.phoneNumber || 'user';
+                    await db.collection('battles').doc(BATTLE_ID).collection('chat').add({
+                        user: username.replace('@gmail.com','').substring(0,10),
+                        text: msg,
+                        time: firebase.firestore.FieldValue.serverTimestamp()
+                    });
                     document.getElementById('chatInput').value = '';
-                    chatBox.scrollTop = chatBox.scrollHeight;
                 }
             }
         }
 
+        function startBattle() {
+            alert('Battle thar tan turin WebRTC/Agora a ngai. Tunah chuan demo camera chauh a ni.');
+        }
+
+        function logout() {
+            if (battleUnsubscribe) battleUnsubscribe();
+            if (chatUnsubscribe) chatUnsubscribe();
+            auth.signOut();
+        }
+
+        // PWA
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js');
         }
